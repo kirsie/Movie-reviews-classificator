@@ -3,6 +3,8 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
+from keras.models import Sequential
+from keras import layers
 
 class Data:
 
@@ -53,9 +55,29 @@ class Data:
         score = classifier.score(self.test_input, self.test_output)
         print(score)
 
+    def simple_neural_network(self):
+
+        input_dim = self.train_input.shape[1]
+        print(input_dim)
+        model = Sequential()
+        model.add(layers.Dense(10, input_dim=input_dim, activation='relu'))
+        model.add(layers.Dense(1, activation='sigmoid'))
+        model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        model.summary()
+
+        history = model.fit(self.train_input, self.train_output,
+                            epochs=200,
+                            validation_data=(self.test_input, self.test_output),
+                            batch_size=1)
+
+        loss, accuracy = model.evaluate(self.train_input, self.train_output, verbose=False)
+        print("Training Accuracy: {:.4f}".format(accuracy))
+        loss, accuracy = model.evaluate(self.test_input, self.test_output, verbose=False)
+        print("Testing Accuracy:  {:.4f}".format(accuracy))
 
 data = Data()
 reviews = data.import_reviews_to_list()
 data.split__data(reviews)
 data.vectorize_string_data()
 data.logistic_regression()
+data.simple_neural_network()
